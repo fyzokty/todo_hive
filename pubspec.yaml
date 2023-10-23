@@ -12,6 +12,14 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.2
+  uuid: ^4.1.0
+  image_picker: ^1.0.4
+  image_picker_android: ^0.8.8+1
+  image_picker_platform_interface: ^2.9.1
+  path_provider: ^2.1.1
+  mime: ^1.0.4
+  omni_datetime_picker: ^1.0.9
+  easy_localization: ^3.0.3
 
 dev_dependencies:
   flutter_test:
@@ -22,3 +30,6 @@ dev_dependencies:
 flutter:
 
   uses-material-design: true
+
+  assets:
+    - asset/language/

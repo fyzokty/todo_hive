@@ -2,7 +2,7 @@
 import 'package:todo/model/app_enum.dart';
 
 class ReminderModel {
-  final int id;
+  final String id;
   final String title;
   final String text;
   final List<String> imgPaths;
