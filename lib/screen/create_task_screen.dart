@@ -253,6 +253,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       createDate: DateTime.now(),
       isFavorited: isFavorited,
       alertDate: alertDate,
+      color: taskColor,
     );
   }
 }
