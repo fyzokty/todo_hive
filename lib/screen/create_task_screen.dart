@@ -15,6 +15,7 @@ class CreateTaskScreen extends StatefulWidget {
 }
 
 class _CreateTaskScreenState extends State<CreateTaskScreen> {
+  final GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
   TextEditingController titleController = TextEditingController();
   TextEditingController noteController = TextEditingController();
   List<XFile> selectedFiles = [];
@@ -95,56 +96,43 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                       duration: AnimationConst.animation,
                       curve: AnimationConst.curve,
                       reverseDuration: AnimationConst.reverseAnimation,
-                      child: SizedBox(
-                        height: selectedFiles.isNotEmpty ? 160 : 0,
-                        child: ListView.separated(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-                          scrollDirection: Axis.horizontal,
-                          itemCount: selectedFiles.length,
-                          separatorBuilder: (context, index) => const SizedBox(width: 20),
-                          itemBuilder: (context, index) {
-                            return SizedBox(
-                              height: 160,
-                              width: 160,
-                              child: Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  Align(
-                                    alignment: Alignment.center,
-                                    child: Container(
-                                      height: 150,
-                                      width: 150,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(14),
-                                        color: Theme.of(context).cardColor,
-                                        boxShadow: const [
-                                          BoxShadow(offset: Offset(3, 3), blurRadius: 4, spreadRadius: 0),
-                                        ],
-                                      ),
-                                      foregroundDecoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(14),
-                                        image: DecorationImage(
-                                            image: FileImage(File(selectedFiles[index].path)), fit: BoxFit.cover, alignment: Alignment.topCenter),
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    right: -5,
-                                    top: -5,
-                                    child: IconButton.filledTonal(
-                                      padding: EdgeInsets.zero,
-                                      visualDensity: VisualDensity.compact,
-                                      icon: const Icon(Icons.clear_rounded),
-                                      onPressed: () {
-                                        selectedFiles.removeAt(index);
-                                        setState(() {});
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
+                      child: AnimatedOpacity(
+                        duration: AnimationConst.animation,
+                        curve: AnimationConst.curve,
+                        opacity: selectedFiles.isNotEmpty ? 1 : 0,
+                        child: SizedBox(
+                          height: selectedFiles.isNotEmpty ? 160 : 0,
+                          child: AnimatedList(
+                            key: listKey,
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                            initialItemCount: selectedFiles.length,
+                            itemBuilder: (context, index, animation) {
+                              final anim = Tween<double>(begin: 0, end: 1).animate(animation);
+                              return FadeTransition(
+                                opacity: anim,
+                                child: ImageListItem(
+                                  imagePath: selectedFiles[index].path,
+                                  onTap: () {
+                                    selectedFiles.removeAt(index);
+                                    listKey.currentState!.removeItem(index, (context, animation) => const SizedBox());
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                          // ListView.separated(
+                          //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                          //   scrollDirection: Axis.horizontal,
+                          //   itemCount: selectedFiles.length,
+                          //   separatorBuilder: (context, index) => const SizedBox(width: 20),
+                          //   itemBuilder: (context, index) {
+                          //     return ImageListItem(
+                          //       imagePath: selectedFiles[index].path,
+                          //       onTap: () {},
+                          //     );
+                          //   },
+                          // ),
                         ),
                       ),
                     ),
@@ -153,7 +141,12 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                       children: [
                         IconButton(
                           onPressed: () async {
+                            for (var i = 0; i < selectedFiles.length; i++) {
+                              listKey.currentState!.removeItem(i, (context, animation) => const SizedBox());
+                              selectedFiles.removeAt(i);
+                            }
                             selectedFiles = await PhotoPicker.pickMultiImage();
+                            listKey.currentState!.insertAllItems(0, selectedFiles.length, duration: AnimationConst.animation);
                             setState(() {});
                           },
                           icon: const Icon(Icons.image_outlined),
@@ -257,6 +250,58 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       isFavorited: isFavorited,
       alertDate: alertDate,
       color: taskColor,
+    );
+  }
+}
+
+class ImageListItem extends StatelessWidget {
+  const ImageListItem({
+    super.key,
+    required this.imagePath,
+    this.onTap,
+  });
+
+  final String imagePath;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 160,
+      width: 160,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Align(
+            alignment: Alignment.center,
+            child: Container(
+              height: 150,
+              width: 150,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                color: Theme.of(context).cardColor,
+                boxShadow: const [
+                  BoxShadow(offset: Offset(3, 3), blurRadius: 4, spreadRadius: 0),
+                ],
+              ),
+              foregroundDecoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                image: DecorationImage(image: FileImage(File(imagePath)), fit: BoxFit.cover, alignment: Alignment.topCenter),
+              ),
+            ),
+          ),
+          Positioned(
+            right: -5,
+            top: -5,
+            child: IconButton.filledTonal(
+              padding: EdgeInsets.zero,
+              visualDensity: VisualDensity.compact,
+              icon: const Icon(Icons.clear_rounded),
+              onPressed: onTap,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
