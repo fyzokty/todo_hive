@@ -1,5 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:todo/model/app_enum.dart';
+import 'package:todo/constant/task_color.dart';
 
 class ReminderModel {
   final String id;

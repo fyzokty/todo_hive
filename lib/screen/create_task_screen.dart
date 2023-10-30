@@ -3,11 +3,9 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
-import 'package:todo/model/app_enum.dart';
-import 'package:todo/model/reminder_model.dart';
-import 'package:todo/service/photo_picker.dart';
-import 'package:todo/widget/date_picker.dart';
 import 'package:uuid/v1.dart';
+
+import 'package:todo/lib.dart';
 
 class CreateTaskScreen extends StatefulWidget {
   const CreateTaskScreen({super.key});
@@ -93,56 +91,61 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                         contentPadding: EdgeInsets.fromLTRB(8, 12, 8, 12),
                       ),
                     ),
-                    SizedBox(
-                      height: selectedFiles.isNotEmpty ? 160 : 0,
-                      child: ListView.separated(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-                        scrollDirection: Axis.horizontal,
-                        itemCount: selectedFiles.length,
-                        separatorBuilder: (context, index) => const SizedBox(width: 20),
-                        itemBuilder: (context, index) {
-                          return SizedBox(
-                            height: 160,
-                            width: 160,
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                Align(
-                                  alignment: Alignment.center,
-                                  child: Container(
-                                    height: 150,
-                                    width: 150,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(14),
-                                      color: Theme.of(context).cardColor,
-                                      boxShadow: const [
-                                        BoxShadow(offset: Offset(3, 3), blurRadius: 4, spreadRadius: 0),
-                                      ],
-                                    ),
-                                    foregroundDecoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(14),
-                                      image: DecorationImage(
-                                          image: FileImage(File(selectedFiles[index].path)), fit: BoxFit.cover, alignment: Alignment.topCenter),
+                    AnimatedSize(
+                      duration: AnimationConst.animation,
+                      curve: AnimationConst.curve,
+                      reverseDuration: AnimationConst.reverseAnimation,
+                      child: SizedBox(
+                        height: selectedFiles.isNotEmpty ? 160 : 0,
+                        child: ListView.separated(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                          scrollDirection: Axis.horizontal,
+                          itemCount: selectedFiles.length,
+                          separatorBuilder: (context, index) => const SizedBox(width: 20),
+                          itemBuilder: (context, index) {
+                            return SizedBox(
+                              height: 160,
+                              width: 160,
+                              child: Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: Container(
+                                      height: 150,
+                                      width: 150,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(14),
+                                        color: Theme.of(context).cardColor,
+                                        boxShadow: const [
+                                          BoxShadow(offset: Offset(3, 3), blurRadius: 4, spreadRadius: 0),
+                                        ],
+                                      ),
+                                      foregroundDecoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(14),
+                                        image: DecorationImage(
+                                            image: FileImage(File(selectedFiles[index].path)), fit: BoxFit.cover, alignment: Alignment.topCenter),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Positioned(
-                                  right: -5,
-                                  top: -5,
-                                  child: IconButton.filledTonal(
-                                    padding: EdgeInsets.zero,
-                                    visualDensity: VisualDensity.compact,
-                                    icon: const Icon(Icons.clear_rounded),
-                                    onPressed: () {
-                                      selectedFiles.removeAt(index);
-                                      setState(() {});
-                                    },
+                                  Positioned(
+                                    right: -5,
+                                    top: -5,
+                                    child: IconButton.filledTonal(
+                                      padding: EdgeInsets.zero,
+                                      visualDensity: VisualDensity.compact,
+                                      icon: const Icon(Icons.clear_rounded),
+                                      onPressed: () {
+                                        selectedFiles.removeAt(index);
+                                        setState(() {});
+                                      },
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                                ],
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
                     Row(
@@ -202,8 +205,8 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                                 child: AnimatedContainer(
                                   height: 20,
                                   width: 20,
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.fastOutSlowIn,
+                                  duration: AnimationConst.animation,
+                                  curve: AnimationConst.curve,
                                   decoration: BoxDecoration(
                                     color: item.color,
                                     shape: BoxShape.circle,
@@ -269,8 +272,8 @@ class ChildBuilder extends StatelessWidget {
       return child;
     } else {
       return AnimatedTheme(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.fastOutSlowIn,
+        duration: AnimationConst.animation,
+        curve: AnimationConst.curve,
         data: ThemeData.from(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: color.color, brightness: MediaQuery.of(context).platformBrightness),
