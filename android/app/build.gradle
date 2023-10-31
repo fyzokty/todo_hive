@@ -42,10 +42,12 @@ android {
 
     defaultConfig {
         applicationId "com.feyizoktay.todo"
-        minSdkVersion flutter.minSdkVersion
+        minSdkVersion 25
         targetSdkVersion 34
+        compileSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -59,4 +61,6 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    implementation 'androidx.multidex:multidex:2.0.1'
+}

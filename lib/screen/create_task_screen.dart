@@ -6,6 +6,7 @@ import 'package:image_picker_platform_interface/image_picker_platform_interface.
 import 'package:uuid/v1.dart';
 
 import 'package:todo/lib.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class CreateTaskScreen extends StatefulWidget {
   const CreateTaskScreen({super.key});
@@ -20,6 +21,8 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   TextEditingController noteController = TextEditingController();
   List<XFile> selectedFiles = [];
   TaskColor taskColor = TaskColor.DEFAULT;
+
+  List<AssetEntity> selectedEntities = [];
 
   bool isFavorited = false;
   DateTime? alertDate;
@@ -40,7 +43,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                 });
               },
               icon: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
+                duration: AnimationConst.animation,
                 transitionBuilder: (child, animation) {
                   Animation<double> d = Tween<double>(begin: 0.6, end: 1).animate(animation);
                   return FadeTransition(opacity: d, child: ScaleTransition(scale: d, child: child));
@@ -108,14 +111,24 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                             initialItemCount: selectedFiles.length,
                             itemBuilder: (context, index, animation) {
-                              final anim = Tween<double>(begin: 0, end: 1).animate(animation);
+                              final item = selectedFiles[index];
                               return FadeTransition(
-                                opacity: anim,
+                                opacity: animation,
                                 child: ImageListItem(
-                                  imagePath: selectedFiles[index].path,
+                                  imagePath: item.path,
                                   onTap: () {
+                                    listKey.currentState!.removeItem(index, (context, animation2) {
+                                      return SizeTransition(
+                                        sizeFactor: animation2,
+                                        axis: Axis.horizontal,
+                                        child: FadeTransition(
+                                          opacity: animation2,
+                                          child: ImageListItem(imagePath: item.path),
+                                        ),
+                                      );
+                                    });
                                     selectedFiles.removeAt(index);
-                                    listKey.currentState!.removeItem(index, (context, animation) => const SizedBox());
+                                    setState(() {});
                                   },
                                 ),
                               );
@@ -141,13 +154,14 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                       children: [
                         IconButton(
                           onPressed: () async {
-                            for (var i = 0; i < selectedFiles.length; i++) {
-                              listKey.currentState!.removeItem(i, (context, animation) => const SizedBox());
-                              selectedFiles.removeAt(i);
-                            }
-                            selectedFiles = await PhotoPicker.pickMultiImage();
-                            listKey.currentState!.insertAllItems(0, selectedFiles.length, duration: AnimationConst.animation);
-                            setState(() {});
+                            AppAssetPicker(context).pickAsset();
+                            // listKey.currentState!.removeAllItems((context, animation) {
+                            //   return const SizedBox();
+                            // });
+                            // selectedFiles.clear();
+                            // selectedFiles = await PhotoPicker.pickMultiImage();
+                            // listKey.currentState!.insertAllItems(0, selectedFiles.length, duration: AnimationConst.animation);
+                            // setState(() {});
                           },
                           icon: const Icon(Icons.image_outlined),
                         ),

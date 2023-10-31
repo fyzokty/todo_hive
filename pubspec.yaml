@@ -20,6 +20,7 @@ dependencies:
   mime: ^1.0.4
   omni_datetime_picker: ^1.0.9
   easy_localization: ^3.0.3
+  wechat_assets_picker: ^8.7.1
 
 dev_dependencies:
   flutter_test:
